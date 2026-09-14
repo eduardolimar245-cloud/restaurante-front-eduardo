@@ -236,7 +236,7 @@ export default function CardapioPage() {
           </div>
         )}
 
-        {/* Rodapé do cardápio */}
+        {/* Rodapé do cardápio */} 
         {!loading && produtos.length > 0 && (
 
           <div className="relative mt-16 overflow-hidden rounded-3xl border border-white/20 bg-white/10 px-6 py-12 text-center shadow-xl backdrop-blur-sm">
