@@ -17,7 +17,11 @@ export default function Pedidos() {
     <div className="w-full max-w-lg bg-white rounded-xl shadow-md p-8 grid grid-cols gap-4">
      
      <Image
+<<<<<<< HEAD
      src="/logotipo-restaurante.jpg"
+=======
+     src="/logotipo.png"
+>>>>>>> 4dcc556 (codigo atualizado)
      alt="Logotipo"
      width={200}
      height={200}
@@ -28,7 +32,11 @@ export default function Pedidos() {
 
       <input type="text"
       placeholder="Digite a descricao..."
+<<<<<<< HEAD
       className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm tex-gray-900"
+=======
+      className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900"
+>>>>>>> 4dcc556 (codigo atualizado)
       />
 
       <input type="number"
@@ -38,12 +46,20 @@ export default function Pedidos() {
 
       <input type="text"
       placeholder="Digite a categoria..."
+<<<<<<< HEAD
       className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm tex-gray-900"
+=======
+      className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900"
+>>>>>>> 4dcc556 (codigo atualizado)
       />
 
       <input type="text"
       placeholder="O lanche está disponivel?"
+<<<<<<< HEAD
       className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm tex-gray-900"
+=======
+      className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900"
+>>>>>>> 4dcc556 (codigo atualizado)
       />
 
       <button 

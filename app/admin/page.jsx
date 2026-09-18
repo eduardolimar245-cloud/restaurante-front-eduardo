@@ -12,7 +12,11 @@ export default function AdminPage() {
     const [imagem, setImagem] = useState("")
     const [carregando, setCarregando] = useState(false)
 
+<<<<<<< HEAD
     async function cadastrarLanche() {
+=======
+    async function cadastrarLanche(e) {
+>>>>>>> 4dcc556 (codigo atualizado)
         e.preventDefault()
 
         const descricaoLimpa = descricao.trim()
