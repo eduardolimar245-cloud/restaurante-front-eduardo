@@ -18,47 +18,62 @@ export default function AdminPage() {
     const categoriaLimpa = categoria.trim();
     const imagemLimpa = imagem.trim();
 
-    // Aceita vírgula ou ponto no preço
     const precoNumerico = Number(preco.replace(",", "."));
 
     if (!descricaoLimpa || !categoriaLimpa || !preco.trim()) {
-      Swal.fire({
+      await Swal.fire({
         title: "Campos obrigatórios",
         text: "Preencha descrição, categoria e preço.",
         icon: "warning",
         confirmButtonColor: "#d4af6a",
       });
+
       return;
     }
 
     if (!Number.isFinite(precoNumerico) || precoNumerico <= 0) {
-      Swal.fire({
+      await Swal.fire({
         title: "Preço inválido",
         text: "Digite um preço maior que zero.",
         icon: "warning",
         confirmButtonColor: "#d4af6a",
       });
+
       return;
     }
 
     try {
       setCarregando(true);
 
-      const response = await fetch("http://localhost:3001/produtos", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          descricao: descricaoLimpa,
-          categoria: categoriaLimpa,
-          preco: precoNumerico,
-          imagem: imagemLimpa,
-        }),
-      });
+      const response = await fetch(
+        `${process.env.API_URL}/produtos`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            descricao: descricaoLimpa,
+            categoria: categoriaLimpa,
+            preco: precoNumerico,
+            imagem: imagemLimpa,
+          }),
+        }
+      );
+
+      let dados;
+
+      try {
+        dados = await response.json();
+      } catch {
+        dados = null;
+      }
 
       if (!response.ok) {
-        throw new Error("Não foi possível cadastrar o produto.");
+        throw new Error(
+          dados?.message ||
+            `Erro ao cadastrar produto. Status: ${response.status}`
+        );
       }
 
       await Swal.fire({
@@ -73,14 +88,21 @@ export default function AdminPage() {
       setPreco("");
       setImagem("");
     } catch (error) {
-      console.error("Erro:", error);
+      console.error("Erro ao cadastrar produto:", error);
 
-      Swal.fire({
-        title: "Erro",
-        text:
-          error instanceof Error
-            ? error.message
-            : "Verifique se o servidor está funcionando.",
+      let mensagemErro =
+        "Não foi possível cadastrar o produto.";
+
+      if (error instanceof TypeError) {
+        mensagemErro =
+          "Não foi possível conectar ao servidor. Verifique se o backend está funcionando na porta 3001.";
+      } else if (error instanceof Error) {
+        mensagemErro = error.message;
+      }
+
+      await Swal.fire({
+        title: "Erro no cadastro",
+        text: mensagemErro,
         icon: "error",
         confirmButtonColor: "#d4af6a",
       });
@@ -95,6 +117,8 @@ export default function AdminPage() {
 
       <div className="px-6 py-12 md:px-10">
         <div className="mx-auto max-w-3xl">
+
+          {/* Cabeçalho */}
           <header className="mb-10 text-center">
             <p className="text-sm font-semibold uppercase tracking-[0.35em] text-[#d4af6a]">
               Área administrativa
@@ -102,7 +126,9 @@ export default function AdminPage() {
 
             <h1 className="mt-3 text-4xl font-extrabold md:text-5xl">
               Cadastrar{" "}
-              <span className="text-[#f1d49a]">Lanche</span>
+              <span className="text-[#f1d49a]">
+                Lanche
+              </span>
             </h1>
 
             <p className="mx-auto mt-4 max-w-xl text-white/70">
@@ -110,7 +136,9 @@ export default function AdminPage() {
             </p>
           </header>
 
+          {/* Formulário */}
           <div className="overflow-hidden rounded-3xl border border-[#d4af6a]/40 bg-[#10251c]/80 shadow-2xl">
+
             <div className="border-b border-[#d4af6a]/30 px-6 py-6">
               <h2 className="text-lg font-bold text-[#f1d49a]">
                 Informações do produto
@@ -125,6 +153,8 @@ export default function AdminPage() {
               onSubmit={cadastrarLanche}
               className="space-y-6 p-6 md:p-8"
             >
+
+              {/* Descrição */}
               <div>
                 <label
                   htmlFor="descricao"
@@ -145,6 +175,7 @@ export default function AdminPage() {
                 />
               </div>
 
+              {/* Categoria */}
               <div>
                 <label
                   htmlFor="categoria"
@@ -165,6 +196,7 @@ export default function AdminPage() {
                 />
               </div>
 
+              {/* Preço */}
               <div>
                 <label
                   htmlFor="preco"
@@ -185,6 +217,7 @@ export default function AdminPage() {
                 />
               </div>
 
+              {/* Imagem */}
               <div>
                 <label
                   htmlFor="imagem"
@@ -207,6 +240,7 @@ export default function AdminPage() {
                 </p>
               </div>
 
+              {/* Pré-visualização */}
               {imagem.trim() && (
                 <div className="rounded-2xl border border-[#d4af6a]/30 bg-[#183d2b] p-4">
                   <p className="mb-3 font-semibold text-[#f1d49a]">
@@ -215,7 +249,10 @@ export default function AdminPage() {
 
                   <img
                     src={imagem.trim()}
-                    alt={descricao.trim() || "Pré-visualização do produto"}
+                    alt={
+                      descricao.trim() ||
+                      "Pré-visualização do produto"
+                    }
                     className="h-56 w-full rounded-xl object-cover"
                     onError={(e) => {
                       e.currentTarget.style.display = "none";
@@ -224,13 +261,17 @@ export default function AdminPage() {
                 </div>
               )}
 
+              {/* Botão */}
               <button
                 type="submit"
                 disabled={carregando}
                 className="w-full rounded-xl bg-[#d4af6a] px-5 py-4 font-bold text-[#10251c] transition hover:bg-[#f1d49a] disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {carregando ? "Cadastrando..." : "Cadastrar Lanche"}
+                {carregando
+                  ? "Cadastrando..."
+                  : "Cadastrar Lanche"}
               </button>
+
             </form>
           </div>
         </div>
