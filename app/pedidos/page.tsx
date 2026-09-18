@@ -1,79 +1,73 @@
-"use client"
+"use client";
 
-import Image from 'next/image'
-
+import Image from "next/image";
 
 export default function Pedidos() {
+  async function cadastrar(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
 
-  async function cadastrar(e:any) {
-    e.preventDefault()
-    alert("Produto cadastrado com sucesso!")
+    alert("Produto cadastrado com sucesso!");
   }
 
-
   return (
-    <main className="min-h-screen bg-gray-100 flex items-center justify-center p-6">
-    
-    <div className="w-full max-w-lg bg-white rounded-xl shadow-md p-8 grid grid-cols gap-4">
-     
-     <Image
-<<<<<<< HEAD
-     src="/logotipo-restaurante.jpg"
-=======
-     src="/logotipo.png"
->>>>>>> 4dcc556 (codigo atualizado)
-     alt="Logotipo"
-     width={200}
-     height={200}
-     className="mx-auto mb-4"
-     />
-
-    
-
-      <input type="text"
-      placeholder="Digite a descricao..."
-<<<<<<< HEAD
-      className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm tex-gray-900"
-=======
-      className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900"
->>>>>>> 4dcc556 (codigo atualizado)
-      />
-
-      <input type="number"
-      placeholder="Digite o preço..."
-      className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900"
-      />
-
-      <input type="text"
-      placeholder="Digite a categoria..."
-<<<<<<< HEAD
-      className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm tex-gray-900"
-=======
-      className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900"
->>>>>>> 4dcc556 (codigo atualizado)
-      />
-
-      <input type="text"
-      placeholder="O lanche está disponivel?"
-<<<<<<< HEAD
-      className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm tex-gray-900"
-=======
-      className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900"
->>>>>>> 4dcc556 (codigo atualizado)
-      />
-
-      <button 
-      onClick={cadastrar}
-      className="w-full rounded-xl 
-      bg-blue-600 px-4 py-3 
-      font-medium text-white shadow-sm cursor-pointer 
-      hover:bg-blue-800" 
+    <main className="flex min-h-screen items-center justify-center bg-gradient-to-br from-[#10251c] via-[#183d2b] to-[#28583d] p-6">
+      <form
+        onSubmit={cadastrar}
+        className="grid w-full max-w-lg gap-4 rounded-3xl border border-[#d4af6a]/40 bg-[#10251c]/90 p-8 shadow-2xl backdrop-blur-sm"
       >
-        Cadastrar
-      </button>
+        <Image
+          src="/imagemNova.png"
+          alt="Logotipo Casa do Sabor"
+          width={200}
+          height={200}
+          className="mx-auto mb-4 object-contain"
+        />
 
+        <h1 className="text-center text-3xl font-bold text-[#f1d49a]">
+          Fazer Pedido
+        </h1>
 
-    </div>
+        <input
+          type="text"
+          placeholder="Digite a descrição..."
+          className="w-full rounded-xl border border-[#d4af6a]/40 bg-white px-4 py-3 text-sm text-[#10251c] outline-none transition focus:border-[#d4af6a] focus:ring-2 focus:ring-[#d4af6a]/40"
+          required
+        />
+
+        <input
+          type="number"
+          placeholder="Digite o preço..."
+          step="0.01"
+          className="w-full rounded-xl border border-[#d4af6a]/40 bg-white px-4 py-3 text-sm text-[#10251c] outline-none transition focus:border-[#d4af6a] focus:ring-2 focus:ring-[#d4af6a]/40"
+          required
+        />
+
+        <input
+          type="text"
+          placeholder="Digite a categoria..."
+          className="w-full rounded-xl border border-[#d4af6a]/40 bg-white px-4 py-3 text-sm text-[#10251c] outline-none transition focus:border-[#d4af6a] focus:ring-2 focus:ring-[#d4af6a]/40"
+          required
+        />
+
+        <select
+          className="w-full rounded-xl border border-[#d4af6a]/40 bg-white px-4 py-3 text-sm text-[#10251c] outline-none transition focus:border-[#d4af6a] focus:ring-2 focus:ring-[#d4af6a]/40"
+          required
+          defaultValue=""
+        >
+          <option value="" disabled>
+            O lanche está disponível?
+          </option>
+          <option value="sim">Sim</option>
+          <option value="nao">Não</option>
+        </select>
+
+        <button
+          type="submit"
+          className="w-full cursor-pointer rounded-xl bg-[#d4af6a] px-4 py-3 font-semibold text-[#10251c] shadow-sm transition hover:bg-[#f1d49a]"
+        >
+          Finalizar Pedido
+        </button>
+      </form>
     </main>
   );
 }

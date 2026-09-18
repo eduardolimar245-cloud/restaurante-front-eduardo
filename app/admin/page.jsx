@@ -1,373 +1,240 @@
-"use client"
+"use client";
 
-import Navbar from "@/components/Navbar"
-import { useState,
- } from "react"
-import Swal from "sweetalert2"
+import Navbar from "@/components/Navbar";
+import { useState } from "react";
+import Swal from "sweetalert2";
 
 export default function AdminPage() {
-    const [descricao, setDescricao] = useState("")
-    const [categoria, setCategoria] = useState("")
-    const [preco, setPreco] = useState("")
-    const [imagem, setImagem] = useState("")
-    const [carregando, setCarregando] = useState(false)
+  const [descricao, setDescricao] = useState("");
+  const [categoria, setCategoria] = useState("");
+  const [preco, setPreco] = useState("");
+  const [imagem, setImagem] = useState("");
+  const [carregando, setCarregando] = useState(false);
 
-<<<<<<< HEAD
-    async function cadastrarLanche() {
-=======
-    async function cadastrarLanche(e) {
->>>>>>> 4dcc556 (codigo atualizado)
-        e.preventDefault()
+  async function cadastrarLanche(e) {
+    e.preventDefault();
 
-        const descricaoLimpa = descricao.trim()
-        const categoriaLimpa = categoria.trim()
-        const imagemLimpa = imagem.trim()
-        const precoNumerico = Number(preco)
+    const descricaoLimpa = descricao.trim();
+    const categoriaLimpa = categoria.trim();
+    const imagemLimpa = imagem.trim();
 
-        // Validação dos campos obrigatórios
-        if (!descricaoLimpa || !categoriaLimpa || !preco.trim()) {
-            await Swal.fire({
-                title: "Campos obrigatórios",
-                text: "Preencha descrição, categoria e preço.",
-                icon: "warning",
-                confirmButtonText: "Entendi",
-                confirmButtonColor: "#dc2626",
-            })
+    // Aceita vírgula ou ponto no preço
+    const precoNumerico = Number(preco.replace(",", "."));
 
-            return
-        }
-
-        // Validação do preço
-        if (!Number.isFinite(precoNumerico) || precoNumerico <= 0) {
-            await Swal.fire({
-                title: "Preço inválido",
-                text: "Informe um preço válido maior que zero.",
-                icon: "warning",
-                confirmButtonText: "Entendi",
-                confirmButtonColor: "#dc2626",
-            })
-
-            return
-        }
-
-        try {
-            setCarregando(true)
-
-            const response = await fetch("http://localhost:3001/produtos", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    descricao: descricaoLimpa,
-                    categoria: categoriaLimpa,
-                    preco: precoNumerico,
-                    imagem: imagemLimpa,
-                }),
-            })
-
-            if (!response.ok) {
-                let mensagemErro = "Erro ao cadastrar produto."
-
-                try {
-                    const dadosErro = await response.json()
-
-                    if (dadosErro?.message) {
-                        mensagemErro = dadosErro.message
-                    }
-                } catch {
-                    // A API pode não retornar JSON em caso de erro.
-                }
-
-                throw new Error(mensagemErro)
-            }
-
-            await Swal.fire({
-                title: "Produto cadastrado!",
-                text: "O lanche foi adicionado ao cardápio com sucesso.",
-                icon: "success",
-                confirmButtonText: "Ok",
-                confirmButtonColor: "#16a34a",
-            })
-
-            // Limpa o formulário
-            setDescricao("")
-            setCategoria("")
-            setPreco("")
-            setImagem("")
-        } catch (error) {
-            console.error("Erro ao cadastrar produto:", error)
-
-            const mensagem =
-                error instanceof Error
-                    ? error.message
-                    : "Não foi possível cadastrar o produto."
-
-            await Swal.fire({
-                title: "Erro",
-                text: mensagem,
-                icon: "error",
-                confirmButtonText: "Entendi",
-                confirmButtonColor: "#dc2626",
-            })
-        } finally {
-            setCarregando(false)
-        }
+    if (!descricaoLimpa || !categoriaLimpa || !preco.trim()) {
+      Swal.fire({
+        title: "Campos obrigatórios",
+        text: "Preencha descrição, categoria e preço.",
+        icon: "warning",
+        confirmButtonColor: "#d4af6a",
+      });
+      return;
     }
 
-    return (
-        <main className="min-h-screen bg-slate-50">
-            <Navbar />
+    if (!Number.isFinite(precoNumerico) || precoNumerico <= 0) {
+      Swal.fire({
+        title: "Preço inválido",
+        text: "Digite um preço maior que zero.",
+        icon: "warning",
+        confirmButtonColor: "#d4af6a",
+      });
+      return;
+    }
 
-            <div className="px-6 py-10 md:px-10">
-                <div className="mx-auto max-w-3xl">
-                    {/* Cabeçalho */}
-                    <header className="mb-8">
-                        <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-red-50 px-3 py-1 text-sm font-semibold text-red-600">
-                            <span
-                                aria-hidden="true"
-                                className="h-2 w-2 rounded-full bg-red-600"
-                            />
+    try {
+      setCarregando(true);
 
-                            Área administrativa
-                        </div>
+      const response = await fetch("http://localhost:3001/produtos", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          descricao: descricaoLimpa,
+          categoria: categoriaLimpa,
+          preco: precoNumerico,
+          imagem: imagemLimpa,
+        }),
+      });
 
-                        <h1 className="text-3xl font-bold tracking-tight text-slate-900 md:text-4xl">
-                            Cadastrar Lanche
-                        </h1>
+      if (!response.ok) {
+        throw new Error("Não foi possível cadastrar o produto.");
+      }
 
-                        <p className="mt-2 text-slate-500">
-                            Adicione um novo produto ao seu cardápio.
-                        </p>
-                    </header>
+      await Swal.fire({
+        title: "Produto cadastrado!",
+        text: "O lanche foi adicionado ao cardápio.",
+        icon: "success",
+        confirmButtonColor: "#d4af6a",
+      });
 
-                    {/* Formulário */}
-                    <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
-                        {/* Cabeçalho do formulário */}
-                        <div className="border-b border-slate-100 bg-gradient-to-r from-red-50 to-white px-6 py-5 md:px-8">
-                            <div className="flex items-center gap-4">
-                                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-red-600 shadow-sm">
-                                    <svg
-                                        className="h-6 w-6 text-white"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                        aria-hidden="true"
-                                    >
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth={2}
-                                            d="M12 4v16m8-8H4"
-                                        />
-                                    </svg>
-                                </div>
+      setDescricao("");
+      setCategoria("");
+      setPreco("");
+      setImagem("");
+    } catch (error) {
+      console.error("Erro:", error);
 
-                                <div>
-                                    <h2 className="font-bold text-slate-900">
-                                        Informações do produto
-                                    </h2>
+      Swal.fire({
+        title: "Erro",
+        text:
+          error instanceof Error
+            ? error.message
+            : "Verifique se o servidor está funcionando.",
+        icon: "error",
+        confirmButtonColor: "#d4af6a",
+      });
+    } finally {
+      setCarregando(false);
+    }
+  }
 
-                                    <p className="text-sm text-slate-500">
-                                        Preencha os dados abaixo para cadastrar o lanche.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
+  return (
+    <main className="min-h-screen bg-gradient-to-br from-[#10251c] via-[#183d2b] to-[#28583d] text-white">
+      <Navbar />
 
-                        <form
-                            onSubmit={cadastrarLanche}
-                            className="space-y-6 p-6 md:p-8"
-                        >
-                            {/* Descrição */}
-                            <div>
-                                <label
-                                    htmlFor="descricao"
-                                    className="mb-2 block text-sm font-semibold text-slate-700"
-                                >
-                                    Descrição
-                                </label>
+      <div className="px-6 py-12 md:px-10">
+        <div className="mx-auto max-w-3xl">
+          <header className="mb-10 text-center">
+            <p className="text-sm font-semibold uppercase tracking-[0.35em] text-[#d4af6a]">
+              Área administrativa
+            </p>
 
-                                <input
-                                    id="descricao"
-                                    name="descricao"
-                                    type="text"
-                                    value={descricao}
-                                    onChange={(e) => setDescricao(e.target.value)}
-                                    placeholder="Ex: X-Bacon com salada e carne"
-                                    required
-                                    maxLength={200}
-                                    autoComplete="off"
-                                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 outline-none transition-all placeholder:text-slate-400 focus:border-red-500 focus:bg-white focus:ring-4 focus:ring-red-100"
-                                />
-                            </div>
+            <h1 className="mt-3 text-4xl font-extrabold md:text-5xl">
+              Cadastrar{" "}
+              <span className="text-[#f1d49a]">Lanche</span>
+            </h1>
 
-                            {/* Categoria */}
-                            <div>
-                                <label
-                                    htmlFor="categoria"
-                                    className="mb-2 block text-sm font-semibold text-slate-700"
-                                >
-                                    Categoria
-                                </label>
+            <p className="mx-auto mt-4 max-w-xl text-white/70">
+              Adicione um novo produto ao cardápio da Casa do Sabor.
+            </p>
+          </header>
 
-                                <input
-                                    id="categoria"
-                                    name="categoria"
-                                    type="text"
-                                    value={categoria}
-                                    onChange={(e) => setCategoria(e.target.value)}
-                                    placeholder="Ex: Hambúrgueres"
-                                    required
-                                    maxLength={100}
-                                    autoComplete="off"
-                                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 outline-none transition-all placeholder:text-slate-400 focus:border-red-500 focus:bg-white focus:ring-4 focus:ring-red-100"
-                                />
-                            </div>
+          <div className="overflow-hidden rounded-3xl border border-[#d4af6a]/40 bg-[#10251c]/80 shadow-2xl">
+            <div className="border-b border-[#d4af6a]/30 px-6 py-6">
+              <h2 className="text-lg font-bold text-[#f1d49a]">
+                Informações do produto
+              </h2>
 
-                            {/* Preço */}
-                            <div>
-                                <label
-                                    htmlFor="preco"
-                                    className="mb-2 block text-sm font-semibold text-slate-700"
-                                >
-                                    Preço
-                                </label>
-
-                                <div className="relative">
-                                    <span
-                                        aria-hidden="true"
-                                        className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-slate-400"
-                                    >
-                                        R$
-                                    </span>
-
-                                    <input
-                                        id="preco"
-                                        name="preco"
-                                        type="number"
-                                        step="0.01"
-                                        min="0.01"
-                                        inputMode="decimal"
-                                        value={preco}
-                                        onChange={(e) => setPreco(e.target.value)}
-                                        placeholder="0.00"
-                                        required
-                                        className="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-11 pr-4 text-slate-900 outline-none transition-all placeholder:text-slate-400 focus:border-red-500 focus:bg-white focus:ring-4 focus:ring-red-100"
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Imagem */}
-                            <div>
-                                <label
-                                    htmlFor="imagem"
-                                    className="mb-2 block text-sm font-semibold text-slate-700"
-                                >
-                                    Imagem
-                                </label>
-
-                                <input
-                                    id="imagem"
-                                    name="imagem"
-                                    type="url"
-                                    value={imagem}
-                                    onChange={(e) => setImagem(e.target.value)}
-                                    placeholder="https://exemplo.com/imagem.jpg"
-                                    maxLength={1000}
-                                    autoComplete="url"
-                                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 outline-none transition-all placeholder:text-slate-400 focus:border-red-500 focus:bg-white focus:ring-4 focus:ring-red-100"
-                                />
-
-                                <p className="mt-2 text-xs text-slate-400">
-                                    Insira o link da imagem do produto.
-                                </p>
-                            </div>
-
-                            {/* Preview */}
-                            {imagem.trim() && (
-                                <div className="overflow-hidden rounded-2xl border border-slate-200 bg-slate-50">
-                                    <div className="border-b border-slate-200 px-4 py-3">
-                                        <p className="text-sm font-semibold text-slate-700">
-                                            Pré-visualização
-                                        </p>
-                                    </div>
-
-                                    <div className="p-4">
-                                        <img
-                                            src={imagem.trim()}
-                                            alt={`Pré-visualização de ${
-                                                descricao.trim() || "produto"
-                                            }`}
-                                            className="h-48 w-full rounded-xl object-cover"
-                                            onError={(e) => {
-                                                e.currentTarget.style.display = "none"
-                                            }}
-                                            onLoad={(e) => {
-                                                e.currentTarget.style.display = "block"
-                                            }}
-                                        />
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Botão */}
-                            <button
-                                type="submit"
-                                disabled={carregando}
-                                className="flex w-full items-center justify-center gap-2 rounded-xl bg-red-600 px-5 py-3.5 font-semibold text-white shadow-sm transition-all duration-200 hover:bg-red-700 hover:shadow-md active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
-                            >
-                                {carregando ? (
-                                    <>
-                                        <svg
-                                            className="h-5 w-5 animate-spin"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            aria-hidden="true"
-                                        >
-                                            <circle
-                                                className="opacity-25"
-                                                cx="12"
-                                                cy="12"
-                                                r="10"
-                                                stroke="currentColor"
-                                                strokeWidth="4"
-                                            />
-
-                                            <path
-                                                className="opacity-75"
-                                                fill="currentColor"
-                                                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                                            />
-                                        </svg>
-
-                                        Cadastrando...
-                                    </>
-                                ) : (
-                                    <>
-                                        <svg
-                                            className="h-5 w-5"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            viewBox="0 0 24 24"
-                                            aria-hidden="true"
-                                        >
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth={2}
-                                                d="M12 4v16m8-8H4"
-                                            />
-                                        </svg>
-
-                                        Cadastrar Lanche
-                                    </>
-                                )}
-                            </button>
-                        </form>
-                    </div>
-                </div>
+              <p className="mt-1 text-sm text-white/60">
+                Preencha os dados abaixo para cadastrar o lanche.
+              </p>
             </div>
-        </main>
-    )
+
+            <form
+              onSubmit={cadastrarLanche}
+              className="space-y-6 p-6 md:p-8"
+            >
+              <div>
+                <label
+                  htmlFor="descricao"
+                  className="mb-2 block font-semibold text-[#f1d49a]"
+                >
+                  Descrição
+                </label>
+
+                <input
+                  id="descricao"
+                  type="text"
+                  value={descricao}
+                  onChange={(e) => setDescricao(e.target.value)}
+                  placeholder="Ex: X-Bacon com salada e carne"
+                  maxLength={200}
+                  required
+                  className="w-full rounded-xl bg-white px-4 py-3 text-[#10251c] outline-none focus:ring-4 focus:ring-[#d4af6a]/40"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="categoria"
+                  className="mb-2 block font-semibold text-[#f1d49a]"
+                >
+                  Categoria
+                </label>
+
+                <input
+                  id="categoria"
+                  type="text"
+                  value={categoria}
+                  onChange={(e) => setCategoria(e.target.value)}
+                  placeholder="Ex: Hambúrgueres"
+                  maxLength={100}
+                  required
+                  className="w-full rounded-xl bg-white px-4 py-3 text-[#10251c] outline-none focus:ring-4 focus:ring-[#d4af6a]/40"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="preco"
+                  className="mb-2 block font-semibold text-[#f1d49a]"
+                >
+                  Preço
+                </label>
+
+                <input
+                  id="preco"
+                  type="text"
+                  inputMode="decimal"
+                  value={preco}
+                  onChange={(e) => setPreco(e.target.value)}
+                  placeholder="Ex: 25,90"
+                  required
+                  className="w-full rounded-xl bg-white px-4 py-3 text-[#10251c] outline-none focus:ring-4 focus:ring-[#d4af6a]/40"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="imagem"
+                  className="mb-2 block font-semibold text-[#f1d49a]"
+                >
+                  Imagem
+                </label>
+
+                <input
+                  id="imagem"
+                  type="url"
+                  value={imagem}
+                  onChange={(e) => setImagem(e.target.value)}
+                  placeholder="https://exemplo.com/imagem.jpg"
+                  className="w-full rounded-xl bg-white px-4 py-3 text-[#10251c] outline-none focus:ring-4 focus:ring-[#d4af6a]/40"
+                />
+
+                <p className="mt-2 text-xs text-white/50">
+                  Insira o link da imagem do produto.
+                </p>
+              </div>
+
+              {imagem.trim() && (
+                <div className="rounded-2xl border border-[#d4af6a]/30 bg-[#183d2b] p-4">
+                  <p className="mb-3 font-semibold text-[#f1d49a]">
+                    Pré-visualização
+                  </p>
+
+                  <img
+                    src={imagem.trim()}
+                    alt={descricao.trim() || "Pré-visualização do produto"}
+                    className="h-56 w-full rounded-xl object-cover"
+                    onError={(e) => {
+                      e.currentTarget.style.display = "none";
+                    }}
+                  />
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={carregando}
+                className="w-full rounded-xl bg-[#d4af6a] px-5 py-4 font-bold text-[#10251c] transition hover:bg-[#f1d49a] disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {carregando ? "Cadastrando..." : "Cadastrar Lanche"}
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </main>
+  );
 }
