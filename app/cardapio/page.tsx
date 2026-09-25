@@ -1,3 +1,4 @@
+
 "use client";
 
 import Navbar from "@/components/Navbar";
@@ -16,25 +17,23 @@ export default function CardapioPage() {
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState("");
 
+  // Buscar produtos da API
   async function mostrarProdutos() {
-    try {
-      setLoading(true);
-      setErro("");
+    setLoading(true);
+    setErro("");
 
-      const response = await fetch(`${process.env.API_URL}/produtos`, {
-        method: "GET",
-        cache: "no-store",
-      });
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/produtos`
+      );
 
       if (!response.ok) {
         throw new Error(`Erro na API: ${response.status}`);
       }
 
-      const data = await response.json();
+      const dados: Produto[] = await response.json();
 
-      console.log("Produtos recebidos:", data);
-
-      setProdutos(data);
+      setProdutos(dados);
     } catch (error) {
       console.error("Erro ao buscar produtos:", error);
 
@@ -48,6 +47,7 @@ export default function CardapioPage() {
     }
   }
 
+  // Executar a busca quando a página carregar
   useEffect(() => {
     mostrarProdutos();
   }, []);
@@ -57,6 +57,7 @@ export default function CardapioPage() {
       <Navbar />
 
       <div className="mx-auto max-w-7xl px-6 py-12">
+
         {/* Cabeçalho */}
         <header className="mb-12 text-center">
           <div className="mb-5 flex items-center justify-center gap-4">
@@ -70,12 +71,16 @@ export default function CardapioPage() {
           </span>
 
           <h1 className="mt-5 text-4xl font-extrabold sm:text-5xl md:text-6xl">
-            Nosso <span className="text-[#f1d49a]">Cardápio</span>
+            Nosso{" "}
+            <span className="text-[#f1d49a]">
+              Cardápio
+            </span>
           </h1>
 
           <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-white/75">
-            Escolha seu prato favorito e aproveite uma experiência deliciosa
-            preparada especialmente para você.
+            Escolha seu prato favorito e aproveite uma
+            experiência deliciosa preparada especialmente
+            para você.
           </p>
         </header>
 
@@ -99,7 +104,9 @@ export default function CardapioPage() {
               Erro ao carregar produtos
             </h2>
 
-            <p className="mt-3 text-white/70">{erro}</p>
+            <p className="mt-3 text-white/70">
+              {erro}
+            </p>
 
             <button
               type="button"
@@ -163,7 +170,8 @@ export default function CardapioPage() {
                   </h2>
 
                   <p className="mt-2 text-sm leading-6 text-gray-500">
-                    Uma opção deliciosa preparada com ingredientes selecionados.
+                    Uma opção deliciosa preparada com
+                    ingredientes selecionados.
                   </p>
 
                   <div className="mt-5 flex items-center justify-between gap-3">
@@ -182,6 +190,11 @@ export default function CardapioPage() {
 
                     <button
                       type="button"
+                      onClick={() =>
+                        alert(
+                          `Produto selecionado: ${produto.descricao}`
+                        )
+                      }
                       className="rounded-xl bg-[#10251c] px-5 py-3 font-semibold text-[#f1d49a] transition hover:bg-[#28583d] active:scale-95"
                     >
                       Pedir
@@ -196,7 +209,9 @@ export default function CardapioPage() {
         {/* Rodapé */}
         {!loading && !erro && produtos.length > 0 && (
           <div className="mt-16 rounded-3xl border border-[#d4af6a]/40 bg-white/10 px-6 py-12 text-center">
-            <div className="mb-4 text-3xl text-[#f1d49a]">✦</div>
+            <div className="mb-4 text-3xl text-[#f1d49a]">
+              ✦
+            </div>
 
             <p className="text-2xl font-bold">
               Encontrou o seu favorito?
