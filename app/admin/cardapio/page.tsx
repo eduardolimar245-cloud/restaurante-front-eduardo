@@ -5,7 +5,6 @@ import Image from "next/image";
 import { useEffect, useState, type FormEvent } from "react";
 import Swal from "sweetalert2";
 
-// URL correta do backend hospedado no Render
 
 
 interface Produto {
@@ -105,7 +104,7 @@ export default function CardapioAdmin() {
 
     try {
       const response = await fetch(
-        `${API_URL}/produtos`,
+        `${process.env.NEXT_PUBLIC_API_URL}/produtos`,
         {
           method: "POST",
           headers: {
@@ -199,7 +198,7 @@ export default function CardapioAdmin() {
 
     try {
       const response = await fetch(
-        `${API_URL}/produtos/${id}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/produtos/${id}`,
         {
           method: "DELETE",
         }
