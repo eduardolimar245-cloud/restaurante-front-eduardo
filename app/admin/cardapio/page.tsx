@@ -5,6 +5,9 @@ import Image from "next/image";
 import { useEffect, useState, type FormEvent } from "react";
 import Swal from "sweetalert2";
 
+// URL correta do backend hospedado no Render
+
+
 interface Produto {
   id: number;
   descricao: string;
@@ -12,9 +15,6 @@ interface Produto {
   preco: number;
   imagem: string;
 }
-
-const API_URL =
-  process.env.NEXT_PUBLIC_API_URL || `${process.env.NEXT_PUBLIC_VERCEL_URL}/api`;
 
 export default function CardapioAdmin() {
   const [produtos, setProdutos] = useState<Produto[]>([]);
@@ -26,12 +26,10 @@ export default function CardapioAdmin() {
   const [preco, setPreco] = useState("");
   const [imagem, setImagem] = useState("");
 
-  // ==============================
   // CARREGAR PRODUTOS
-  // ==============================
   async function carregarProdutos() {
     try {
-      const response = await fetch(`${API_URL}/produtos`);
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/produtos`);
 
       if (!response.ok) {
         throw new Error(
@@ -47,9 +45,11 @@ export default function CardapioAdmin() {
 
       await Swal.fire({
         title: "Erro",
-        text: "Não foi possível carregar os produtos. Verifique se o servidor está funcionando.",
+        text:
+          error instanceof Error
+            ? error.message
+            : "Não foi possível carregar os produtos.",
         icon: "error",
-        confirmButtonText: "Ok",
         confirmButtonColor: "#d4af6a",
       });
     } finally {
@@ -57,19 +57,25 @@ export default function CardapioAdmin() {
     }
   }
 
-  // ==============================
   // CADASTRAR PRODUTO
-  // ==============================
   async function cadastrarProduto(
     e: FormEvent<HTMLFormElement>
   ) {
     e.preventDefault();
 
+    const descricaoLimpa = descricao.trim();
+    const categoriaLimpa = categoria.trim();
+    const imagemLimpa = imagem.trim();
+
+    const precoNumerico = Number(
+      preco.replace(",", ".")
+    );
+
     if (
-      !descricao.trim() ||
-      !categoria ||
-      !preco ||
-      !imagem.trim()
+      !descricaoLimpa ||
+      !categoriaLimpa ||
+      !preco.trim() ||
+      !imagemLimpa
     ) {
       await Swal.fire({
         title: "Atenção",
@@ -80,8 +86,6 @@ export default function CardapioAdmin() {
 
       return;
     }
-
-    const precoNumerico = Number(preco.replace(",", "."));
 
     if (
       !Number.isFinite(precoNumerico) ||
@@ -100,24 +104,42 @@ export default function CardapioAdmin() {
     setCadastrando(true);
 
     try {
-      const response = await fetch(`${API_URL}/produtos`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          descricao: descricao.trim(),
-          categoria,
-          preco: precoNumerico,
-          imagem: imagem.trim(),
-        }),
-      });
+      const response = await fetch(
+        `${API_URL}/produtos`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            descricao: descricaoLimpa,
+            categoria: categoriaLimpa,
+            preco: precoNumerico,
+            imagem: imagemLimpa,
+          }),
+        }
+      );
+
+      const texto = await response.text();
+
+      let dados: {
+        mensagem?: string;
+        message?: string;
+      } | null = null;
+
+      if (texto) {
+        try {
+          dados = JSON.parse(texto);
+        } catch {
+          dados = null;
+        }
+      }
 
       if (!response.ok) {
-        const mensagem = await response.text();
-
         throw new Error(
-          mensagem || `Erro ao cadastrar: ${response.status}`
+          dados?.mensagem ||
+            dados?.message ||
+            `Erro ao cadastrar produto: ${response.status}`
         );
       }
 
@@ -127,18 +149,22 @@ export default function CardapioAdmin() {
       setPreco("");
       setImagem("");
 
-      // Atualizar a lista de produtos
+      // Atualizar a lista
       await carregarProdutos();
 
       await Swal.fire({
         title: "Sucesso!",
-        text: "Produto cadastrado com sucesso.",
+        text:
+          dados?.mensagem ||
+          "Produto cadastrado com sucesso.",
         icon: "success",
-        confirmButtonText: "Ok",
         confirmButtonColor: "#d4af6a",
       });
     } catch (error) {
-      console.error("Erro ao cadastrar produto:", error);
+      console.error(
+        "Erro ao cadastrar produto:",
+        error
+      );
 
       await Swal.fire({
         title: "Erro ao cadastrar",
@@ -147,7 +173,6 @@ export default function CardapioAdmin() {
             ? error.message
             : "Não foi possível cadastrar o produto.",
         icon: "error",
-        confirmButtonText: "Ok",
         confirmButtonColor: "#d4af6a",
       });
     } finally {
@@ -155,9 +180,7 @@ export default function CardapioAdmin() {
     }
   }
 
-  // ==============================
   // EXCLUIR PRODUTO
-  // ==============================
   async function excluirProduto(id: number) {
     const resultado = await Swal.fire({
       title: "Excluir produto?",
@@ -182,9 +205,26 @@ export default function CardapioAdmin() {
         }
       );
 
+      const texto = await response.text();
+
+      let dados: {
+        mensagem?: string;
+        message?: string;
+      } | null = null;
+
+      if (texto) {
+        try {
+          dados = JSON.parse(texto);
+        } catch {
+          dados = null;
+        }
+      }
+
       if (!response.ok) {
         throw new Error(
-          `Erro ao excluir produto: ${response.status}`
+          dados?.mensagem ||
+            dados?.message ||
+            `Erro ao excluir produto: ${response.status}`
         );
       }
 
@@ -198,11 +238,13 @@ export default function CardapioAdmin() {
         title: "Produto excluído",
         text: "O produto foi excluído com sucesso.",
         icon: "success",
-        confirmButtonText: "Ok",
         confirmButtonColor: "#d4af6a",
       });
     } catch (error) {
-      console.error("Erro ao excluir produto:", error);
+      console.error(
+        "Erro ao excluir produto:",
+        error
+      );
 
       await Swal.fire({
         title: "Erro",
@@ -211,22 +253,17 @@ export default function CardapioAdmin() {
             ? error.message
             : "Não foi possível excluir o produto.",
         icon: "error",
-        confirmButtonText: "Ok",
         confirmButtonColor: "#d4af6a",
       });
     }
   }
 
-  // ==============================
   // CARREGAR AO ABRIR A PÁGINA
-  // ==============================
   useEffect(() => {
     carregarProdutos();
   }, []);
 
-  // ==============================
   // TELA DE CARREGAMENTO
-  // ==============================
   if (carregando) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-gradient-to-br from-[#10251c] via-[#183d2b] to-[#28583d]">
@@ -239,9 +276,7 @@ export default function CardapioAdmin() {
     );
   }
 
-  // ==============================
   // PÁGINA PRINCIPAL
-  // ==============================
   return (
     <main className="min-h-screen bg-gradient-to-br from-[#10251c] via-[#183d2b] to-[#28583d] px-6 py-12 text-white">
       <div className="mx-auto max-w-7xl">
@@ -250,9 +285,11 @@ export default function CardapioAdmin() {
         <header className="mb-12 text-center">
           <div className="mb-5 flex items-center justify-center gap-4">
             <span className="h-px w-16 bg-[#d4af6a]/70" />
+
             <span className="text-xl text-[#f1d49a]">
               ✦
             </span>
+
             <span className="h-px w-16 bg-[#d4af6a]/70" />
           </div>
 
@@ -268,12 +305,12 @@ export default function CardapioAdmin() {
           </h1>
 
           <p className="mx-auto mt-4 max-w-2xl text-white/70">
-            Cadastre, visualize e gerencie todos os produtos
-            cadastrados no restaurante.
+            Cadastre, visualize e gerencie todos os
+            produtos cadastrados no restaurante.
           </p>
         </header>
 
-        {/* FORMULÁRIO DE CADASTRO */}
+        {/* FORMULÁRIO */}
         <section className="mx-auto mb-16 max-w-3xl rounded-3xl border border-[#d4af6a]/40 bg-[#10251c]/70 p-6 shadow-2xl backdrop-blur-md sm:p-10">
           <h2 className="mb-6 text-2xl font-bold text-[#f1d49a]">
             Cadastrar novo produto
@@ -300,6 +337,7 @@ export default function CardapioAdmin() {
                   setDescricao(e.target.value)
                 }
                 placeholder="Ex.: Hambúrguer artesanal"
+                maxLength={200}
                 required
                 className="w-full rounded-xl border border-[#d4af6a]/30 bg-white/10 px-4 py-3 text-white outline-none placeholder:text-white/40 focus:border-[#f1d49a]"
               />
@@ -326,21 +364,27 @@ export default function CardapioAdmin() {
                 <option value="">
                   Selecione uma categoria
                 </option>
+
                 <option value="Hambúrgueres">
                   Hambúrgueres
                 </option>
+
                 <option value="Pizzas">
                   Pizzas
                 </option>
+
                 <option value="Bebidas">
                   Bebidas
                 </option>
+
                 <option value="Porções">
                   Porções
                 </option>
+
                 <option value="Sobremesas">
                   Sobremesas
                 </option>
+
                 <option value="Outros">
                   Outros
                 </option>
@@ -358,14 +402,13 @@ export default function CardapioAdmin() {
 
               <input
                 id="preco"
-                type="number"
-                step="0.01"
-                min="0.01"
+                type="text"
+                inputMode="decimal"
                 value={preco}
                 onChange={(e) =>
                   setPreco(e.target.value)
                 }
-                placeholder="Ex.: 25.90"
+                placeholder="Ex.: 25,90"
                 required
                 className="w-full rounded-xl border border-[#d4af6a]/30 bg-white/10 px-4 py-3 text-white outline-none placeholder:text-white/40 focus:border-[#f1d49a]"
               />
@@ -406,7 +449,7 @@ export default function CardapioAdmin() {
           </form>
         </section>
 
-        {/* QUANTIDADE DE PRODUTOS */}
+        {/* QUANTIDADE */}
         <div className="mb-8 flex justify-center">
           <div className="rounded-full border border-[#d4af6a]/40 bg-[#10251c]/60 px-6 py-2 backdrop-blur-md">
             <span className="text-sm text-white/70">
