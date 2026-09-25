@@ -6,8 +6,8 @@ import { useState } from "react";
 
 import Swal from "sweetalert2";
 
-const API_URL =
-  process.env.NEXT_PUBLIC_API_URL || `${process.env.NEXT_PUBLIC_VERCEL_URL}/api`;
+ const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/produtos`);
 
 export default function AdminPage() {
   const [descricao, setDescricao] = useState("");
@@ -48,7 +48,7 @@ export default function AdminPage() {
     try {
       setCarregando(true);
 
-      const response = await fetch(`${API_URL}/produtos`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/produtos`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
