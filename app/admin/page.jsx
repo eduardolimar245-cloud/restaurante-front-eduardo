@@ -3,11 +3,7 @@
 
 import Navbar from "@/components/Navbar";
 import { useState } from "react";
-
 import Swal from "sweetalert2";
-
- const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/produtos`);
 
 export default function AdminPage() {
   const [descricao, setDescricao] = useState("");
@@ -22,7 +18,6 @@ export default function AdminPage() {
     const descricaoLimpa = descricao.trim();
     const categoriaLimpa = categoria.trim();
     const imagemLimpa = imagem.trim();
-
     const precoNumerico = Number(preco.replace(",", "."));
 
     if (!descricaoLimpa || !categoriaLimpa || !preco.trim()) {
@@ -45,10 +40,14 @@ export default function AdminPage() {
       return;
     }
 
+    // URL da API
+    const API_URL =
+      process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+
     try {
       setCarregando(true);
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/produtos`, {
+      const response = await fetch(`${API_URL}/produtos`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -61,9 +60,10 @@ export default function AdminPage() {
         }),
       });
 
+      // Lê a resposta sem presumir que seja JSON
       const textoResposta = await response.text();
 
-      
+      let dados = null;
 
       if (textoResposta) {
         try {
@@ -87,6 +87,7 @@ export default function AdminPage() {
         confirmButtonColor: "#d4af6a",
       });
 
+      // Limpa os campos após o cadastro
       setDescricao("");
       setCategoria("");
       setPreco("");
@@ -98,7 +99,7 @@ export default function AdminPage() {
 
       if (error instanceof TypeError) {
         mensagemErro =
-          "Não foi possível conectar ao servidor. Confira se o backend está funcionando na porta 3001 e se o CORS está configurado.";
+          "Não foi possível conectar ao servidor. Verifique se o backend está funcionando na porta 3001 e se o CORS está configurado.";
       } else if (error instanceof Error) {
         mensagemErro = error.message;
       }
@@ -265,7 +266,9 @@ export default function AdminPage() {
                 disabled={carregando}
                 className="w-full rounded-xl bg-[#d4af6a] px-5 py-4 font-bold text-[#10251c] transition hover:bg-[#f1d49a] disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {carregando ? "Cadastrando..." : "Cadastrar Lanche"}
+                {carregando
+                  ? "Cadastrando..."
+                  : "Cadastrar Lanche"}
               </button>
             </form>
           </div>
